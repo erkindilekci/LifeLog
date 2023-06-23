@@ -38,8 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.erkindilekci.lifelog.model.Diary
-import com.erkindilekci.lifelog.model.Mood
+import com.erkindilekci.lifelog.data.model.Diary
+import com.erkindilekci.lifelog.data.model.Mood
 import com.erkindilekci.lifelog.presentation.util.theme.Elevation
 import com.erkindilekci.lifelog.presentation.util.theme.Shapes
 import com.erkindilekci.lifelog.util.toInstant
@@ -62,7 +62,7 @@ fun DiaryHolder(
         modifier = Modifier.clickable(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
-        ) { onClick(diary._id.toString()) }
+        ) { onClick(diary._id.toHexString()) }
     ) {
         Spacer(modifier = Modifier.width(14.dp))
 
@@ -70,7 +70,7 @@ fun DiaryHolder(
             modifier = Modifier
                 .width(2.dp)
                 .height(componentHeight + 14.dp),
-            tonalElevation = Elevation.Level1
+            tonalElevation = Elevation.Level4
         ) {}
 
         Spacer(modifier = Modifier.width(20.dp))

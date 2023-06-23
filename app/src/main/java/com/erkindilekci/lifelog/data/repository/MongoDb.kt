@@ -1,9 +1,9 @@
 package com.erkindilekci.lifelog.data.repository
 
+import com.erkindilekci.lifelog.BuildConfig
+import com.erkindilekci.lifelog.data.model.Diary
 import com.erkindilekci.lifelog.domain.repository.Diaries
 import com.erkindilekci.lifelog.domain.repository.MongoRepository
-import com.erkindilekci.lifelog.model.Diary
-import com.erkindilekci.lifelog.util.Constants.APP_ID
 import com.erkindilekci.lifelog.util.RequestState
 import com.erkindilekci.lifelog.util.toInstant
 import io.realm.kotlin.Realm
@@ -15,11 +15,12 @@ import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.mongodb.kbson.ObjectId
 import java.time.ZoneId
 
 object MongoDb : MongoRepository {
 
-    private val app = App.create(APP_ID)
+    private val app = App.create(BuildConfig.APP_ID)
     private val user = app.currentUser
     private lateinit var realm: Realm
 
@@ -58,6 +59,55 @@ object MongoDb : MongoRepository {
             }
         } else {
             flow { emit(RequestState.Error(UserNotAuthenticatedException())) }
+        }
+    }
+
+    override fun getSelectedDiary(diaryId: ObjectId): Flow<RequestState<Diary>> {
+        return if (user != null) {
+            try {
+                realm.query<Diary>("_id == $0", diaryId).asFlow().map {
+                    RequestState.Success(it.list.first())
+                }
+            } catch (e: Exception) {
+                flow { emit(RequestState.Error(e)) }
+            }
+        } else {
+            flow { emit(RequestState.Error(UserNotAuthenticatedException())) }
+        }
+    }
+
+    override suspend fun insertDiary(diary: Diary): RequestState<Diary> {
+        return if (user != null) {
+            realm.write {
+                try {
+                    val addedDiary = copyToRealm(diary.apply { ownerId = user.id })
+                    RequestState.Success(addedDiary)
+                } catch (e: Exception) {
+                    RequestState.Error(e)
+                }
+            }
+        } else {
+            RequestState.Error(UserNotAuthenticatedException())
+        }
+    }
+
+    override suspend fun updateDiary(diary: Diary): RequestState<Diary> {
+        return if (user != null) {
+            realm.write {
+                val queriedDiary = query<Diary>("_id == $0", diary._id).first().find()
+                if (queriedDiary != null) {
+                    queriedDiary.title = diary.title
+                    queriedDiary.description = diary.description
+                    queriedDiary.mood = diary.mood
+                    queriedDiary.images = diary.images
+                    queriedDiary.date = diary.date
+                    RequestState.Success(queriedDiary)
+                } else {
+                    RequestState.Error(Exception("Queried diary doesn't exist."))
+                }
+            }
+        } else {
+            RequestState.Error(UserNotAuthenticatedException())
         }
     }
 }

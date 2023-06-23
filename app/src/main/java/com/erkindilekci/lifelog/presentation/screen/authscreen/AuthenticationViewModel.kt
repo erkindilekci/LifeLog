@@ -3,7 +3,7 @@ package com.erkindilekci.lifelog.presentation.screen.authscreen
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erkindilekci.lifelog.util.Constants.APP_ID
+import com.erkindilekci.lifelog.BuildConfig
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,7 @@ class AuthenticationViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    App.create(APP_ID).login(
+                    App.create(BuildConfig.APP_ID).login(
                         Credentials.jwt(tokenId)
                     ).loggedIn
                 }

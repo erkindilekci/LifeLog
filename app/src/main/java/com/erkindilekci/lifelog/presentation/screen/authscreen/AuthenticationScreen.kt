@@ -9,7 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.erkindilekci.lifelog.util.Constants.CLIENT_ID
+import com.erkindilekci.lifelog.BuildConfig
 import com.stevdzasan.messagebar.ContentWithMessageBar
 import com.stevdzasan.messagebar.MessageBarState
 import com.stevdzasan.onetap.OneTapSignInState
@@ -47,7 +47,7 @@ fun AuthenticationScreen(
 
     OneTapSignInWithGoogle(
         state = oneTapSignInState,
-        clientId = CLIENT_ID,
+        clientId = BuildConfig.CLIENT_ID,
         onTokenIdReceived = { tokenId ->
             onTokenIdReceived(tokenId)
         },

@@ -6,10 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
-import com.erkindilekci.lifelog.presentation.util.Navigation
-import com.erkindilekci.lifelog.presentation.util.Screen
+import com.erkindilekci.lifelog.presentation.util.navigation.Navigation
+import com.erkindilekci.lifelog.presentation.util.navigation.Screen
 import com.erkindilekci.lifelog.presentation.util.theme.LifeLogTheme
-import com.erkindilekci.lifelog.util.Constants.APP_ID
 import io.realm.kotlin.mongodb.App
 
 class MainActivity : ComponentActivity() {
@@ -36,6 +35,6 @@ class MainActivity : ComponentActivity() {
 }
 
 private fun getStartDestination(): String {
-    val user = App.create(APP_ID).currentUser
+    val user = App.create(BuildConfig.APP_ID).currentUser
     return if (user != null && user.loggedIn) Screen.Home.route else Screen.Authentication.route
 }

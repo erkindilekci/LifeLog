@@ -34,10 +34,14 @@ fun HomeScreen(
     drawerState: DrawerState,
     onSignOutClicked: () -> Unit,
     onMenuClicked: () -> Unit,
-    navigateToWrite: () -> Unit
+    navigateToWrite: () -> Unit,
+    navigateToWriteWithArgs: (String) -> Unit,
 ) {
     var padding by remember { mutableStateOf(PaddingValues()) }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        snapAnimationSpec = null,
+        flingAnimationSpec = null
+    )
 
     HomeNavigationDrawer(drawerState = drawerState, onSignOutClicked = onSignOutClicked) {
         Scaffold(
@@ -45,8 +49,8 @@ fun HomeScreen(
             topBar = {
                 HomeTopBar(onMenuClicked = onMenuClicked, scrollBehavior = scrollBehavior)
             },
-            content = {
-                padding = it
+            content = { paddingValues ->
+                padding = paddingValues
                 when (diaries) {
                     is RequestState.Error -> {
                         EmptyScreen(
@@ -65,7 +69,11 @@ fun HomeScreen(
                     }
 
                     is RequestState.Success -> {
-                        HomeContent(paddingValues = it, diaries = diaries.data, onClick = {})
+                        HomeContent(
+                            paddingValues = paddingValues,
+                            diaries = diaries.data,
+                            onClick = navigateToWriteWithArgs
+                        )
                     }
 
                     else -> {}

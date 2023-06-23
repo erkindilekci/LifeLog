@@ -1,4 +1,4 @@
-package com.erkindilekci.lifelog.model
+package com.erkindilekci.lifelog.data.model
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color

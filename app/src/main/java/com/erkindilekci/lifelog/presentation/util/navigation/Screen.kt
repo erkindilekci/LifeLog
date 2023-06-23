@@ -1,4 +1,4 @@
-package com.erkindilekci.lifelog.presentation.util
+package com.erkindilekci.lifelog.presentation.util.navigation
 
 import com.erkindilekci.lifelog.util.Constants.WRITE_SCREEN_ARGUMENT_KEY
 
