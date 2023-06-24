@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,14 +42,16 @@ class AddEditViewModel(
     private fun fetchSelectedDiary() {
         uiState.value.selectedDiaryId?.let { diaryId ->
             viewModelScope.launch(Dispatchers.Main) {
-                MongoDb.getSelectedDiary(diaryId = ObjectId.invoke(diaryId)).collect { diary ->
-                    if (diary is RequestState.Success) {
-                        updateTitle(title = diary.data.title)
-                        updateDescription(description = diary.data.description)
-                        updateMood(mood = Mood.valueOf(diary.data.mood))
-                        updateSelectedDiary(diary = diary.data)
+                MongoDb.getSelectedDiary(diaryId = ObjectId.invoke(diaryId))
+                    .catch { emit(RequestState.Error(Exception("Diary is already deleted."))) }
+                    .collect { diary ->
+                        if (diary is RequestState.Success) {
+                            updateTitle(title = diary.data.title)
+                            updateDescription(description = diary.data.description)
+                            updateMood(mood = Mood.valueOf(diary.data.mood))
+                            updateSelectedDiary(diary = diary.data)
+                        }
                     }
-                }
             }
         }
     }
@@ -137,6 +141,27 @@ class AddEditViewModel(
                 updateDiary(diary, onSuccess, onError)
             } else {
                 insertDiary(diary, onSuccess, onError)
+            }
+        }
+    }
+
+    fun deleteDiary(
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (uiState.value.selectedDiaryId != null) {
+                val result = MongoDb.deleteDiary(ObjectId.invoke(uiState.value.selectedDiaryId!!))
+
+                if (result is RequestState.Success) {
+                    withContext(Dispatchers.Main) {
+                        onSuccess()
+                    }
+                } else if (result is RequestState.Error) {
+                    withContext(Dispatchers.Main) {
+                        onError(result.error.localizedMessage ?: "Unknown error occurred!")
+                    }
+                }
             }
         }
     }

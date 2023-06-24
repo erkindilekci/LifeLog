@@ -1,5 +1,6 @@
 package com.erkindilekci.lifelog.presentation.util.navigation
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
@@ -7,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -32,6 +34,7 @@ fun NavGraphBuilder.writeRoute(
         val viewModel: AddEditViewModel = viewModel()
         val uiState by viewModel.uiState.collectAsState()
         val pagerState = rememberPagerState()
+        val context = LocalContext.current
         val pageNumber by remember {
             derivedStateOf { pagerState.currentPage }
         }
@@ -47,13 +50,37 @@ fun NavGraphBuilder.writeRoute(
             onBackClicked = onBackClicked,
             onTitleChanged = { viewModel.updateTitle(it) },
             onDescriptionChanged = { viewModel.updateDescription(it) },
-            onDeleteConfirmed = {},
             onDateTimeUpdated = { viewModel.updateDateTime(it) },
+            onDeleteConfirmed = {
+                viewModel.deleteDiary(
+                    onSuccess = {
+                        Toast.makeText(
+                            context,
+                            "Deleted: ${uiState.title}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onBackClicked()
+                    },
+                    onError = { errorMessage ->
+                        Toast.makeText(
+                            context,
+                            errorMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+            },
             onSaveClicked = {
                 viewModel.upsertDiary(
                     diary = it.apply { mood = Mood.values()[pageNumber].name },
                     onSuccess = onBackClicked,
-                    onError = {}
+                    onError = { errorMessage ->
+                        Toast.makeText(
+                            context,
+                            errorMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 )
             }
         )
