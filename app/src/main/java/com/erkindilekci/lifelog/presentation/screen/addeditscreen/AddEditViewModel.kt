@@ -8,6 +8,7 @@ import com.erkindilekci.lifelog.data.model.Mood
 import com.erkindilekci.lifelog.data.repository.MongoDb
 import com.erkindilekci.lifelog.util.Constants.WRITE_SCREEN_ARGUMENT_KEY
 import com.erkindilekci.lifelog.util.RequestState
+import com.erkindilekci.lifelog.util.toRealmInstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
+import java.time.ZonedDateTime
 
 class AddEditViewModel(
     private val savedStateHandle: SavedStateHandle
@@ -62,6 +64,12 @@ class AddEditViewModel(
         }
     }
 
+    fun updateDateTime(zonedDateTime: ZonedDateTime) {
+        _uiState.update {
+            it.copy(updatedDateTime = zonedDateTime.toInstant().toRealmInstant())
+        }
+    }
+
     private fun updateMood(mood: Mood) {
         _uiState.update {
             it.copy(mood = mood)
@@ -79,7 +87,11 @@ class AddEditViewModel(
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        val result = MongoDb.insertDiary(diary = diary)
+        val result = MongoDb.insertDiary(diary = diary.apply {
+            if (uiState.value.updatedDateTime != null) {
+                date = uiState.value.updatedDateTime!!
+            }
+        })
         if (result is RequestState.Success) {
             withContext(Dispatchers.Main) {
                 onSuccess()
@@ -99,7 +111,9 @@ class AddEditViewModel(
         val result = MongoDb.updateDiary(
             diary.apply {
                 _id = ObjectId.invoke(uiState.value.selectedDiaryId!!)
-                date = uiState.value.selectedDiary!!.date
+                date = if (uiState.value.updatedDateTime != null) {
+                    uiState.value.updatedDateTime!!
+                } else uiState.value.selectedDiary!!.date
             }
         )
         if (result is RequestState.Success) {

@@ -1,7 +1,6 @@
 package com.erkindilekci.lifelog.presentation.screen.addeditscreen
 
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
@@ -10,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.erkindilekci.lifelog.data.model.Diary
 import com.erkindilekci.lifelog.data.model.Mood
+import java.time.ZonedDateTime
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -21,7 +21,8 @@ fun AddEditScreen(
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     moodName: () -> String,
-    onSaveClicked: (Diary) -> Unit
+    onSaveClicked: (Diary) -> Unit,
+    onDateTimeUpdated: (ZonedDateTime) -> Unit
 ) {
     LaunchedEffect(key1 = uiState.mood) {
         val targetPage = Mood.valueOf(uiState.mood.name).ordinal
@@ -37,7 +38,8 @@ fun AddEditScreen(
                 selectedDiary = uiState.selectedDiary,
                 onBackClicked = onBackClicked,
                 onDeleteConfirmed = onDeleteConfirmed,
-                moodName = moodName
+                moodName = moodName,
+                onDateTimeUpdated = onDateTimeUpdated
             )
         },
         content = { paddingValues ->

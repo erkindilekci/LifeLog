@@ -48,6 +48,7 @@ fun NavGraphBuilder.writeRoute(
             onTitleChanged = { viewModel.updateTitle(it) },
             onDescriptionChanged = { viewModel.updateDescription(it) },
             onDeleteConfirmed = {},
+            onDateTimeUpdated = { viewModel.updateDateTime(it) },
             onSaveClicked = {
                 viewModel.upsertDiary(
                     diary = it.apply { mood = Mood.values()[pageNumber].name },
