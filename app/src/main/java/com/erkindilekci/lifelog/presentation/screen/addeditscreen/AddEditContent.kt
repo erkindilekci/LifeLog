@@ -1,8 +1,8 @@
 package com.erkindilekci.lifelog.presentation.screen.addeditscreen
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,21 +43,26 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.erkindilekci.lifelog.R
 import com.erkindilekci.lifelog.data.model.Diary
+import com.erkindilekci.lifelog.data.model.GalleryState
 import com.erkindilekci.lifelog.data.model.Mood
+import com.erkindilekci.lifelog.presentation.component.GalleryUploader
 import com.erkindilekci.lifelog.presentation.util.theme.Shapes
+import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddEditContent(
     paddingValues: PaddingValues,
     pagerState: PagerState,
+    uiState: AddEditUiState,
+    galleryState: GalleryState,
     title: String,
     onTitleChanged: (String) -> Unit,
     description: String,
     onDescriptionChanged: (String) -> Unit,
-    onSaveClicked: (Diary) -> Unit
+    onSaveClicked: (Diary) -> Unit,
+    onImageSelected: (Uri) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -73,7 +78,7 @@ fun AddEditContent(
             .fillMaxSize()
             .imePadding()
             .navigationBarsPadding()
-            .padding(top = paddingValues.calculateTopPadding(),)
+            .padding(top = paddingValues.calculateTopPadding())
             .padding(bottom = 24.dp)
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.SpaceBetween
@@ -106,13 +111,22 @@ fun AddEditContent(
                             .build(),
                         contentDescription = "Mood Icon"
                     )
-                    if (page == 0) {
+                    if (page == 0 && uiState.selectedDiaryId == null) {
                         Icon(
                             painter = painterResource(id = R.drawable.swipe_left),
                             contentDescription = "Swipe Left Icon",
                             modifier = Modifier
                                 .size(24.dp)
                                 .align(Alignment.CenterEnd)
+                        )
+                    }
+                    if (page == Mood.values().size - 1 && uiState.selectedDiaryId == null) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.swipe_right),
+                            contentDescription = "Swipe Left Icon",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .align(Alignment.CenterStart)
                         )
                     }
                 }
@@ -177,6 +191,15 @@ fun AddEditContent(
         Column(verticalArrangement = Arrangement.Bottom) {
             Spacer(modifier = Modifier.height(12.dp))
 
+            GalleryUploader(
+                galleryState = galleryState,
+                onImageSelected = onImageSelected,
+                onAddClicked = { focusManager.clearFocus() },
+                onImageClicked = { }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -188,6 +211,8 @@ fun AddEditContent(
                             Diary().apply {
                                 this.title = title
                                 this.description = description
+                                this.images =
+                                    galleryState.images.map { it.remoteImagePath }.toRealmList()
                             }
                         )
                     } else {

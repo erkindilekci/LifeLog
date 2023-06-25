@@ -34,6 +34,7 @@ fun NavGraphBuilder.writeRoute(
         val viewModel: AddEditViewModel = viewModel()
         val uiState by viewModel.uiState.collectAsState()
         val pagerState = rememberPagerState()
+        val galleryState = viewModel.galleryState
         val context = LocalContext.current
         val pageNumber by remember {
             derivedStateOf { pagerState.currentPage }
@@ -46,6 +47,7 @@ fun NavGraphBuilder.writeRoute(
         AddEditScreen(
             uiState = uiState,
             pagerState = pagerState,
+            galleryState = galleryState,
             moodName = { Mood.values()[pageNumber].name },
             onBackClicked = onBackClicked,
             onTitleChanged = { viewModel.updateTitle(it) },
@@ -81,6 +83,13 @@ fun NavGraphBuilder.writeRoute(
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                )
+            },
+            onImageSelected = { uri ->
+                val type = context.contentResolver.getType(uri)?.split("/")?.last() ?: "jpg"
+                viewModel.addImage(
+                    image = uri,
+                    imageType = type
                 )
             }
         )

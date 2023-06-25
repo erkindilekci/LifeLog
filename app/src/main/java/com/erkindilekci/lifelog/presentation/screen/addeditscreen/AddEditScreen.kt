@@ -1,5 +1,6 @@
 package com.erkindilekci.lifelog.presentation.screen.addeditscreen
 
+import android.net.Uri
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -8,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.erkindilekci.lifelog.data.model.Diary
+import com.erkindilekci.lifelog.data.model.GalleryState
 import com.erkindilekci.lifelog.data.model.Mood
 import java.time.ZonedDateTime
 
@@ -16,13 +18,15 @@ import java.time.ZonedDateTime
 fun AddEditScreen(
     uiState: AddEditUiState,
     pagerState: PagerState,
+    galleryState: GalleryState,
     onBackClicked: () -> Unit,
     onDeleteConfirmed: () -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     moodName: () -> String,
     onSaveClicked: (Diary) -> Unit,
-    onDateTimeUpdated: (ZonedDateTime) -> Unit
+    onDateTimeUpdated: (ZonedDateTime) -> Unit,
+    onImageSelected: (Uri) -> Unit
 ) {
     LaunchedEffect(key1 = uiState.mood) {
         val targetPage = Mood.valueOf(uiState.mood.name).ordinal
@@ -46,11 +50,14 @@ fun AddEditScreen(
             AddEditContent(
                 paddingValues = paddingValues,
                 pagerState = pagerState,
+                galleryState = galleryState,
                 title = uiState.title,
                 onTitleChanged = onTitleChanged,
                 description = uiState.description,
                 onDescriptionChanged = onDescriptionChanged,
-                onSaveClicked = onSaveClicked
+                onSaveClicked = onSaveClicked,
+                uiState = uiState,
+                onImageSelected = onImageSelected
             )
         }
     )

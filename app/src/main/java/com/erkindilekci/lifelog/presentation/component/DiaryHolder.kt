@@ -1,5 +1,7 @@
 package com.erkindilekci.lifelog.presentation.component
 
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -23,7 +25,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -42,6 +47,7 @@ import com.erkindilekci.lifelog.data.model.Diary
 import com.erkindilekci.lifelog.data.model.Mood
 import com.erkindilekci.lifelog.presentation.util.theme.Elevation
 import com.erkindilekci.lifelog.presentation.util.theme.Shapes
+import com.erkindilekci.lifelog.util.fetchImagesFromFirebase
 import com.erkindilekci.lifelog.util.toInstant
 import io.realm.kotlin.ext.realmListOf
 import java.time.Instant
@@ -55,8 +61,37 @@ fun DiaryHolder(
     onClick: (String) -> Unit
 ) {
     val localDensity = LocalDensity.current
+    val context = LocalContext.current
     var componentHeight by remember { mutableStateOf(0.dp) }
     var galleryOpened by remember { mutableStateOf(false) }
+    var galleryLoading by remember { mutableStateOf(false) }
+    val downloadedImages = remember { mutableStateListOf<Uri>() }
+
+    LaunchedEffect(key1 = galleryOpened) {
+        if (galleryOpened && downloadedImages.isEmpty()) {
+            galleryLoading = true
+            fetchImagesFromFirebase(
+                remoteImagePaths = diary.images,
+                onImageDownload = { image ->
+                    downloadedImages.add(image)
+                },
+                onImageDownloadFailed = {
+                    Toast.makeText(
+                        context,
+                        "Images not uploaded yet." +
+                                "Wait a little bit, or try uploading again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    galleryLoading = false
+                    galleryOpened = false
+                },
+                onReadyToDisplay = {
+                    galleryLoading = false
+                    galleryOpened = true
+                }
+            )
+        }
+    }
 
     Row(
         modifier = Modifier.clickable(
@@ -103,6 +138,7 @@ fun DiaryHolder(
                 if (diary.images.isNotEmpty()) {
                     ShowGalleryButton(
                         galleryOpened = galleryOpened,
+                        galleryLoading = galleryLoading,
                         onClick = { galleryOpened = !galleryOpened }
                     )
                 }
@@ -124,7 +160,7 @@ fun DiaryHolder(
                             bottom = 7.dp
                         )
                     ) {
-                        Gallery(images = diary.images)
+                        Gallery(images = downloadedImages)
                         Spacer(modifier = Modifier.height(7.dp))
                     }
                 }
@@ -172,11 +208,13 @@ fun DiaryHeader(moodName: String, time: Instant) {
 @Composable
 fun ShowGalleryButton(
     galleryOpened: Boolean,
+    galleryLoading: Boolean,
     onClick: () -> Unit
 ) {
     TextButton(onClick = onClick) {
         Text(
-            text = if (galleryOpened) "Hide Gallery" else "Show Gallery",
+            text = if (galleryOpened) if (galleryLoading) "Loading" else "Hide Gallery"
+            else "Show Gallery",
             style = TextStyle(fontSize = MaterialTheme.typography.bodySmall.fontSize)
         )
     }
@@ -187,8 +225,9 @@ fun ShowGalleryButton(
 fun HappyDiaryHolderPreview() {
     DiaryHolder(diary = Diary().apply {
         title = "My Diary"
-        description =
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
+                "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," +
+                " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
         mood = Mood.Happy.name
         images = realmListOf("", "")
     }, onClick = {})
@@ -199,8 +238,9 @@ fun HappyDiaryHolderPreview() {
 fun DepressedDiaryHolderPreview() {
     DiaryHolder(diary = Diary().apply {
         title = "My Diary"
-        description =
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
+                "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," +
+                " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
         mood = Mood.Depressed.name
         images = realmListOf("", "")
     }, onClick = {})

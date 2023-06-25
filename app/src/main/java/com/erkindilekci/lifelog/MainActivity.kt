@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.erkindilekci.lifelog.presentation.util.navigation.Navigation
 import com.erkindilekci.lifelog.presentation.util.navigation.Screen
 import com.erkindilekci.lifelog.presentation.util.theme.LifeLogTheme
+import com.google.firebase.FirebaseApp
 import io.realm.kotlin.mongodb.App
 
 class MainActivity : ComponentActivity() {
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
             keepSplashOpened
         }
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        FirebaseApp.initializeApp(this)
         setContent {
             LifeLogTheme {
                 val navController = rememberNavController()
