@@ -1,4 +1,4 @@
-package com.erkindilekci.lifelog.presentation.util.navigation
+package com.erkindilekci.lifelog.util.navigation
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -9,7 +9,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -31,7 +31,7 @@ fun NavGraphBuilder.writeRoute(
             defaultValue = null
         })
     ) {
-        val viewModel: AddEditViewModel = viewModel()
+        val viewModel: AddEditViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsState()
         val pagerState = rememberPagerState()
         val galleryState = viewModel.galleryState
@@ -91,7 +91,8 @@ fun NavGraphBuilder.writeRoute(
                     image = uri,
                     imageType = type
                 )
-            }
+            },
+            onImageDeleteClicked = { galleryState.removeImage(it) }
         )
     }
 }

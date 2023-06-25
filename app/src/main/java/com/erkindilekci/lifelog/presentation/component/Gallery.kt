@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,16 +29,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.erkindilekci.lifelog.R
 import com.erkindilekci.lifelog.data.model.GalleryImage
 import com.erkindilekci.lifelog.data.model.GalleryState
-import com.erkindilekci.lifelog.presentation.util.theme.Elevation
-import com.erkindilekci.lifelog.presentation.util.theme.Shapes
+import com.erkindilekci.lifelog.presentation.ui.theme.Elevation
+import com.erkindilekci.lifelog.presentation.ui.theme.Shapes
 import kotlin.math.max
 
 @Composable
@@ -72,7 +76,8 @@ fun Gallery(
                         .crossfade(600)
                         .build(),
                     contentDescription = "Image",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.loading)
                 )
                 Spacer(modifier = Modifier.width(spaceBetween))
             }
@@ -141,7 +146,8 @@ fun GalleryUploader(
                         .crossfade(600)
                         .build(),
                     contentDescription = "Image",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.loading)
                 )
                 Spacer(modifier = Modifier.width(spaceBetween))
             }
@@ -151,6 +157,58 @@ fun GalleryUploader(
                     remainingImages = remainingImages.value,
                     imageShape = imageShape
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun GalleryRow(
+    modifier: Modifier = Modifier,
+    galleryState: GalleryState,
+    imageSize: Dp = 75.dp,
+    imageShape: CornerBasedShape = Shapes.medium,
+    spaceBetween: Dp = 12.dp,
+    onAddClicked: () -> Unit,
+    onImageSelected: (Uri) -> Unit,
+    onImageClicked: (GalleryImage) -> Unit,
+) {
+    val multiplePhotoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(8),
+    ) { images ->
+        images.forEach { onImageSelected(it) }
+    }
+
+    BoxWithConstraints(modifier = modifier) {
+        LazyRow {
+            item {
+                AddImageButton(
+                    imageSize = imageSize,
+                    imageShape = imageShape,
+                    onClick = {
+                        onAddClicked()
+                        multiplePhotoPicker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+                )
+                Spacer(modifier = Modifier.width(spaceBetween))
+            }
+            items(galleryState.images) { galleryImage ->
+                AsyncImage(
+                    modifier = Modifier
+                        .clip(imageShape)
+                        .size(imageSize, (imageSize * 4) / 3)
+                        .clickable { onImageClicked(galleryImage) },
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(galleryImage.image)
+                        .crossfade(600)
+                        .build(),
+                    contentDescription = "Image",
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.loading)
+                )
+                Spacer(modifier = Modifier.width(spaceBetween))
             }
         }
     }

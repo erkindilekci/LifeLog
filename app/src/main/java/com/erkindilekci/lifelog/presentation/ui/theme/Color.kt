@@ -1,4 +1,4 @@
-package com.erkindilekci.lifelog.presentation.util.theme
+package com.erkindilekci.lifelog.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

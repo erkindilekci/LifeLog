@@ -45,8 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.erkindilekci.lifelog.data.model.Diary
 import com.erkindilekci.lifelog.data.model.Mood
-import com.erkindilekci.lifelog.presentation.util.theme.Elevation
-import com.erkindilekci.lifelog.presentation.util.theme.Shapes
+import com.erkindilekci.lifelog.presentation.ui.theme.Elevation
+import com.erkindilekci.lifelog.presentation.ui.theme.Shapes
 import com.erkindilekci.lifelog.util.fetchImagesFromFirebase
 import com.erkindilekci.lifelog.util.toInstant
 import io.realm.kotlin.ext.realmListOf
@@ -144,7 +144,7 @@ fun DiaryHolder(
                 }
 
                 AnimatedVisibility(
-                    visible = galleryOpened,
+                    visible = galleryOpened && !galleryLoading,
                     enter = fadeIn() + expandVertically(
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,

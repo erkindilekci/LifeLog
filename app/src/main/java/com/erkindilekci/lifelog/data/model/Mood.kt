@@ -3,22 +3,22 @@ package com.erkindilekci.lifelog.data.model
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
 import com.erkindilekci.lifelog.R
-import com.erkindilekci.lifelog.presentation.util.theme.AngryColor
-import com.erkindilekci.lifelog.presentation.util.theme.AwfulColor
-import com.erkindilekci.lifelog.presentation.util.theme.BoredColor
-import com.erkindilekci.lifelog.presentation.util.theme.CalmColor
-import com.erkindilekci.lifelog.presentation.util.theme.DepressedColor
-import com.erkindilekci.lifelog.presentation.util.theme.DisappointedColor
-import com.erkindilekci.lifelog.presentation.util.theme.HappyColor
-import com.erkindilekci.lifelog.presentation.util.theme.HumorousColor
-import com.erkindilekci.lifelog.presentation.util.theme.LonelyColor
-import com.erkindilekci.lifelog.presentation.util.theme.MysteriousColor
-import com.erkindilekci.lifelog.presentation.util.theme.NeutralColor
-import com.erkindilekci.lifelog.presentation.util.theme.RomanticColor
-import com.erkindilekci.lifelog.presentation.util.theme.ShamefulColor
-import com.erkindilekci.lifelog.presentation.util.theme.SurprisedColor
-import com.erkindilekci.lifelog.presentation.util.theme.SuspiciousColor
-import com.erkindilekci.lifelog.presentation.util.theme.TenseColor
+import com.erkindilekci.lifelog.presentation.ui.theme.AngryColor
+import com.erkindilekci.lifelog.presentation.ui.theme.AwfulColor
+import com.erkindilekci.lifelog.presentation.ui.theme.BoredColor
+import com.erkindilekci.lifelog.presentation.ui.theme.CalmColor
+import com.erkindilekci.lifelog.presentation.ui.theme.DepressedColor
+import com.erkindilekci.lifelog.presentation.ui.theme.DisappointedColor
+import com.erkindilekci.lifelog.presentation.ui.theme.HappyColor
+import com.erkindilekci.lifelog.presentation.ui.theme.HumorousColor
+import com.erkindilekci.lifelog.presentation.ui.theme.LonelyColor
+import com.erkindilekci.lifelog.presentation.ui.theme.MysteriousColor
+import com.erkindilekci.lifelog.presentation.ui.theme.NeutralColor
+import com.erkindilekci.lifelog.presentation.ui.theme.RomanticColor
+import com.erkindilekci.lifelog.presentation.ui.theme.ShamefulColor
+import com.erkindilekci.lifelog.presentation.ui.theme.SurprisedColor
+import com.erkindilekci.lifelog.presentation.ui.theme.SuspiciousColor
+import com.erkindilekci.lifelog.presentation.ui.theme.TenseColor
 
 enum class Mood(
     @DrawableRes val icon: Int,

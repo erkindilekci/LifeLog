@@ -1,4 +1,4 @@
-package com.erkindilekci.lifelog.presentation.util.navigation
+package com.erkindilekci.lifelog.util.navigation
 
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState

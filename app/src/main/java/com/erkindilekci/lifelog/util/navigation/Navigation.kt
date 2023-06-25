@@ -1,4 +1,4 @@
-package com.erkindilekci.lifelog.presentation.util.navigation
+package com.erkindilekci.lifelog.util.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
