@@ -1,6 +1,7 @@
 package com.erkindilekci.lifelog.util.navigation
 
 import android.widget.Toast
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
@@ -11,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.erkindilekci.lifelog.BuildConfig
@@ -45,19 +45,26 @@ fun NavGraphBuilder.homeRoute(
             }
         }
 
-        HomeScreen(
-            diaries = diaries,
-            drawerState = drawerState,
-            onSignOutClicked = { signInDialogOpened = true },
-            onDeleteAllClicked = { deleteAllDialogOpened = true },
-            navigateToWrite = navigateToWrite,
-            navigateToWriteWithArgs = navigateToWriteWithArgs,
-            onMenuClicked = {
-                scope.launch {
-                    drawerState.open()
+        if (diaries is RequestState.Loading) {
+            CircularProgressIndicator()
+        } else if (diaries is RequestState.Success) {
+            HomeScreen(
+                diaries = diaries,
+                drawerState = drawerState,
+                onSignOutClicked = { signInDialogOpened = true },
+                onDeleteAllClicked = { deleteAllDialogOpened = true },
+                navigateToWrite = navigateToWrite,
+                navigateToWriteWithArgs = navigateToWriteWithArgs,
+                isDateSelected = viewModel.isDateSelected,
+                onDateSelected = { viewModel.getDiaries(it) },
+                onDateReset = { viewModel.getDiaries() },
+                onMenuClicked = {
+                    scope.launch {
+                        drawerState.open()
+                    }
                 }
-            }
-        )
+            )
+        }
 
         DisplayAlertDialog(
             title = "Sign Out",

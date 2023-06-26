@@ -7,7 +7,7 @@ import com.erkindilekci.lifelog.data.local.dao.ImageToUploadDao
 import com.erkindilekci.lifelog.data.local.entity.ImageToDelete
 import com.erkindilekci.lifelog.data.local.entity.ImageToUpload
 
-@Database(entities = [ImageToUpload::class, ImageToDelete::class], version = 1, exportSchema = false)
+@Database(entities = [ImageToUpload::class, ImageToDelete::class], version = 2)
 abstract class ImagesDatabase : RoomDatabase() {
 
     abstract fun imageToUploadDao(): ImageToUploadDao

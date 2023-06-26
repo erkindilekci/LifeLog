@@ -12,11 +12,13 @@ import io.realm.kotlin.log.LogLevel
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import org.mongodb.kbson.ObjectId
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 object MongoDb : MongoRepository {
 
@@ -54,6 +56,27 @@ object MongoDb : MongoRepository {
                             it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
                         })
                     }
+            } catch (e: Exception) {
+                flow { emit(RequestState.Error(e)) }
+            }
+        } else {
+            flow { emit(RequestState.Error(UserNotAuthenticatedException())) }
+        }
+    }
+
+    override fun getFilteredDiaries(zonedDateTime: ZonedDateTime): Flow<Diaries> {
+        return if (user != null) {
+            try {
+                realm.query<Diary>(
+                    "ownerId == $0 AND date < $1 AND date > $2",
+                    user.id,
+                    RealmInstant.from(zonedDateTime.plusDays(1).toInstant().epochSecond, 0),
+                    RealmInstant.from(zonedDateTime.minusDays(1).toInstant().epochSecond, 0)
+                ).asFlow().map { result ->
+                    RequestState.Success(result.list.groupBy {
+                        it.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                    })
+                }
             } catch (e: Exception) {
                 flow { emit(RequestState.Error(e)) }
             }

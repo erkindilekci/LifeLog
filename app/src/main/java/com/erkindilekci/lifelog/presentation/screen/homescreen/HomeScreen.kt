@@ -26,6 +26,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import com.erkindilekci.lifelog.domain.repository.Diaries
 import com.erkindilekci.lifelog.util.RequestState
+import java.time.ZonedDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +35,9 @@ fun HomeScreen(
     drawerState: DrawerState,
     onSignOutClicked: () -> Unit,
     onDeleteAllClicked: () -> Unit,
+    isDateSelected: Boolean,
+    onDateSelected: (ZonedDateTime) -> Unit,
+    onDateReset: () -> Unit,
     onMenuClicked: () -> Unit,
     navigateToWrite: () -> Unit,
     navigateToWriteWithArgs: (String) -> Unit,
@@ -52,7 +56,13 @@ fun HomeScreen(
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                HomeTopBar(onMenuClicked = onMenuClicked, scrollBehavior = scrollBehavior)
+                HomeTopBar(
+                    onMenuClicked = onMenuClicked,
+                    scrollBehavior = scrollBehavior,
+                    dateIsSelected = isDateSelected,
+                    onDateReset = onDateReset,
+                    onDateSelected = onDateSelected
+                )
             },
             content = { paddingValues ->
                 padding = paddingValues

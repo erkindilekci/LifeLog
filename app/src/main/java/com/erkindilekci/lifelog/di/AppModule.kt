@@ -2,6 +2,8 @@ package com.erkindilekci.lifelog.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.erkindilekci.lifelog.data.connectivity.NetworkConnectivityObserver
 import com.erkindilekci.lifelog.data.local.ImagesDatabase
 import com.erkindilekci.lifelog.data.local.dao.ImageToDeleteDao
@@ -21,14 +23,16 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideImagesDatabase(
+    fun provideDatabase(
         @ApplicationContext context: Context
-    ): ImagesDatabase = Room.databaseBuilder(
-        context,
-        ImagesDatabase::class.java,
-        IMAGES_DATABASE
-    ).build()
-    
+    ): ImagesDatabase {
+        return Room.databaseBuilder(
+            context = context,
+            klass = ImagesDatabase::class.java,
+            name = IMAGES_DATABASE
+        ).fallbackToDestructiveMigration().build()
+    }
+
     @Provides
     @Singleton
     fun provideImageToUploadDao(
@@ -45,5 +49,5 @@ object AppModule {
     @Singleton
     fun provideNetworkConnectivityObserver(
         @ApplicationContext context: Context
-    ): ConnectivityObserver = NetworkConnectivityObserver(context)
+    ) = NetworkConnectivityObserver(context)
 }

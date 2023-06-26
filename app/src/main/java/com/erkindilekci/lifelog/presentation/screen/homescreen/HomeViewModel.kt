@@ -17,8 +17,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,19 +30,48 @@ class HomeViewModel @Inject constructor(
     private val imageToDeleteDao: ImageToDeleteDao
 ) : ViewModel() {
 
+    private lateinit var allDiariesJob: Job
+    private lateinit var filteredDiariesJob: Job
+
     private var network by mutableStateOf(ConnectivityObserver.Status.Unavailable)
     var diaries: MutableState<Diaries> = mutableStateOf(RequestState.Idle)
+    var isDateSelected by mutableStateOf(false)
+        private set
 
     init {
-        observeAllDiaries()
+        getDiaries()
         viewModelScope.launch {
             connectivity.observe().collect { network = it }
         }
     }
 
+    fun getDiaries(zonedDateTime: ZonedDateTime? = null) {
+        isDateSelected = zonedDateTime != null
+        diaries.value = RequestState.Loading
+        if (isDateSelected && zonedDateTime != null) {
+            observeFilteredDiaries(zonedDateTime)
+        } else {
+            observeAllDiaries()
+        }
+    }
+
     private fun observeAllDiaries() {
-        viewModelScope.launch {
+        allDiariesJob = viewModelScope.launch {
+            if (::filteredDiariesJob.isInitialized) {
+                filteredDiariesJob.cancelAndJoin()
+            }
             MongoDb.getAllDiaries().collect { result ->
+                diaries.value = result
+            }
+        }
+    }
+
+    private fun observeFilteredDiaries(zonedDateTime: ZonedDateTime) {
+        filteredDiariesJob = viewModelScope.launch {
+            if (::allDiariesJob.isInitialized) {
+                allDiariesJob.cancelAndJoin()
+            }
+            MongoDb.getFilteredDiaries(zonedDateTime).collect { result ->
                 diaries.value = result
             }
         }
