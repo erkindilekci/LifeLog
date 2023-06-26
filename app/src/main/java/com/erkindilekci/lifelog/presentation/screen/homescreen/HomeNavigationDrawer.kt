@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import com.erkindilekci.lifelog.R
 fun HomeNavigationDrawer(
     drawerState: DrawerState,
     onSignOutClicked: () -> Unit,
+    onDeleteAllClicked: () -> Unit,
     content: @Composable () -> Unit
 ) {
     ModalNavigationDrawer(
@@ -55,6 +58,25 @@ fun HomeNavigationDrawer(
                         },
                         selected = false,
                         onClick = onSignOutClicked
+                    )
+
+                    NavigationDrawerItem(
+                        label = {
+                            Row(modifier = Modifier.padding(horizontal = 12.dp)) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete All Icon",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Delete All Logs",
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        },
+                        selected = false,
+                        onClick = onDeleteAllClicked
                     )
                 }
             )

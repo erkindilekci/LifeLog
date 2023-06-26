@@ -33,6 +33,7 @@ fun HomeScreen(
     diaries: Diaries,
     drawerState: DrawerState,
     onSignOutClicked: () -> Unit,
+    onDeleteAllClicked: () -> Unit,
     onMenuClicked: () -> Unit,
     navigateToWrite: () -> Unit,
     navigateToWriteWithArgs: (String) -> Unit,
@@ -43,7 +44,11 @@ fun HomeScreen(
         flingAnimationSpec = null
     )
 
-    HomeNavigationDrawer(drawerState = drawerState, onSignOutClicked = onSignOutClicked) {
+    HomeNavigationDrawer(
+        drawerState = drawerState,
+        onSignOutClicked = onSignOutClicked,
+        onDeleteAllClicked = onDeleteAllClicked
+    ) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {

@@ -1,5 +1,6 @@
 package com.erkindilekci.lifelog.util.navigation
 
+import android.widget.Toast
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
@@ -8,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -28,10 +31,12 @@ fun NavGraphBuilder.homeRoute(
     onDataLoaded: () -> Unit
 ) {
     composable(Screen.Home.route) {
-        val viewModel: HomeViewModel = viewModel()
+        val context = LocalContext.current
+        val viewModel: HomeViewModel = hiltViewModel()
         val diaries by viewModel.diaries
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        var dialogOpened by rememberSaveable { mutableStateOf(false) }
+        var signInDialogOpened by rememberSaveable { mutableStateOf(false) }
+        var deleteAllDialogOpened by rememberSaveable { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(key1 = diaries) {
@@ -43,7 +48,8 @@ fun NavGraphBuilder.homeRoute(
         HomeScreen(
             diaries = diaries,
             drawerState = drawerState,
-            onSignOutClicked = { dialogOpened = true },
+            onSignOutClicked = { signInDialogOpened = true },
+            onDeleteAllClicked = { deleteAllDialogOpened = true },
             navigateToWrite = navigateToWrite,
             navigateToWriteWithArgs = navigateToWriteWithArgs,
             onMenuClicked = {
@@ -56,8 +62,8 @@ fun NavGraphBuilder.homeRoute(
         DisplayAlertDialog(
             title = "Sign Out",
             message = "Are you sure you want to sign out?",
-            dialogOpened = dialogOpened,
-            onDialogClosed = { dialogOpened = false },
+            dialogOpened = signInDialogOpened,
+            onDialogClosed = { signInDialogOpened = false },
             onYesClicked = {
                 scope.launch(Dispatchers.IO) {
                     val user = App.create(BuildConfig.APP_ID).currentUser
@@ -66,6 +72,39 @@ fun NavGraphBuilder.homeRoute(
                         navigateToAuth()
                     }
                 }
+            }
+        )
+
+        DisplayAlertDialog(
+            title = "Delete All",
+            message = "Are you sure you want to permanently delete all logs?",
+            dialogOpened = deleteAllDialogOpened,
+            onDialogClosed = { deleteAllDialogOpened = false },
+            onYesClicked = {
+                viewModel.deleteAllDiaries(
+                    onSuccess = {
+                        Toast.makeText(
+                            context,
+                            "All logs have been deleted.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    },
+                    onError = {
+                        Toast.makeText(
+                            context,
+                            if (it.message == "No Internet Connection.")
+                                "Internet connection is needed for deleting all logs."
+                            else it.localizedMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }
+                )
             }
         )
     }
