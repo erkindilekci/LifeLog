@@ -29,13 +29,12 @@ class HomeViewModel @Inject constructor(
     private val connectivity: NetworkConnectivityObserver,
     private val imageToDeleteDao: ImageToDeleteDao
 ) : ViewModel() {
-
     private lateinit var allDiariesJob: Job
     private lateinit var filteredDiariesJob: Job
 
-    private var network by mutableStateOf(ConnectivityObserver.Status.Unavailable)
     var diaries: MutableState<Diaries> = mutableStateOf(RequestState.Idle)
-    var isDateSelected by mutableStateOf(false)
+    private var network by mutableStateOf(ConnectivityObserver.Status.Unavailable)
+    var dateIsSelected by mutableStateOf(false)
         private set
 
     init {
@@ -46,10 +45,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun getDiaries(zonedDateTime: ZonedDateTime? = null) {
-        isDateSelected = zonedDateTime != null
+        dateIsSelected = zonedDateTime != null
         diaries.value = RequestState.Loading
-        if (isDateSelected && zonedDateTime != null) {
-            observeFilteredDiaries(zonedDateTime)
+        if (dateIsSelected && zonedDateTime != null) {
+            observeFilteredDiaries(zonedDateTime = zonedDateTime)
         } else {
             observeAllDiaries()
         }
@@ -71,7 +70,7 @@ class HomeViewModel @Inject constructor(
             if (::allDiariesJob.isInitialized) {
                 allDiariesJob.cancelAndJoin()
             }
-            MongoDb.getFilteredDiaries(zonedDateTime).collect { result ->
+            MongoDb.getFilteredDiaries(zonedDateTime = zonedDateTime).collect { result ->
                 diaries.value = result
             }
         }
@@ -83,18 +82,20 @@ class HomeViewModel @Inject constructor(
     ) {
         if (network == ConnectivityObserver.Status.Available) {
             val userId = FirebaseAuth.getInstance().currentUser?.uid
-            val imagesDirectory = "images/$userId"
+            val imagesDirectory = "images/${userId}"
             val storage = FirebaseStorage.getInstance().reference
             storage.child(imagesDirectory)
                 .listAll()
                 .addOnSuccessListener {
-                    it.items.forEach { reference ->
-                        val imagePath = "images/$userId/${reference.name}"
+                    it.items.forEach { ref ->
+                        val imagePath = "images/${userId}/${ref.name}"
                         storage.child(imagePath).delete()
                             .addOnFailureListener {
                                 viewModelScope.launch(Dispatchers.IO) {
                                     imageToDeleteDao.addImageToDelete(
-                                        ImageToDelete(remoteImagePath = imagePath)
+                                        ImageToDelete(
+                                            remoteImagePath = imagePath
+                                        )
                                     )
                                 }
                             }

@@ -157,7 +157,7 @@ fun AddEditContent(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         scope.launch {
-                            scrollState.animateScrollTo(Int.MAX_VALUE)
+                            scrollState.scrollTo(Int.MAX_VALUE)
                             focusManager.moveFocus(FocusDirection.Down)
                         }
                     }
