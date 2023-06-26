@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.erkindilekci.lifelog.data.model.Diary
 import com.erkindilekci.lifelog.presentation.component.DiaryHolder
+import com.erkindilekci.lifelog.util.RequestState
 import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -35,7 +36,9 @@ fun HomeContent(
     diaries: Map<LocalDate, List<Diary>>,
     onClick: (String) -> Unit
 ) {
-    if (diaries.isNotEmpty()) {
+    if (diaries.isEmpty()) {
+        EmptyScreen()
+    } else {
         LazyColumn(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
@@ -54,8 +57,6 @@ fun HomeContent(
                 }
             }
         }
-    } else {
-        EmptyScreen()
     }
 }
 
