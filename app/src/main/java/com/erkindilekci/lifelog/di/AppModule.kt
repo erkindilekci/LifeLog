@@ -2,13 +2,10 @@ package com.erkindilekci.lifelog.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.erkindilekci.lifelog.data.connectivity.NetworkConnectivityObserver
 import com.erkindilekci.lifelog.data.local.ImagesDatabase
 import com.erkindilekci.lifelog.data.local.dao.ImageToDeleteDao
 import com.erkindilekci.lifelog.data.local.dao.ImageToUploadDao
-import com.erkindilekci.lifelog.domain.connectivity.ConnectivityObserver
 import com.erkindilekci.lifelog.util.Constants.IMAGES_DATABASE
 import dagger.Module
 import dagger.Provides
