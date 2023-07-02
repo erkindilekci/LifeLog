@@ -9,6 +9,7 @@
 
 ## Technologies
 - Jetpack Compose
+- Modularization
 - Mongo DB Authentication
 - Mongo DB Realm/Device Sync
 - Mongo DB Realm
