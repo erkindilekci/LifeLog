@@ -2,11 +2,11 @@ package com.erkindilekci.lifelog.di
 
 import android.content.Context
 import androidx.room.Room
-import com.erkindilekci.lifelog.data.connectivity.NetworkConnectivityObserver
-import com.erkindilekci.lifelog.data.local.ImagesDatabase
-import com.erkindilekci.lifelog.data.local.dao.ImageToDeleteDao
-import com.erkindilekci.lifelog.data.local.dao.ImageToUploadDao
-import com.erkindilekci.lifelog.util.Constants.IMAGES_DATABASE
+import com.erkindilekci.mongo.local.ImagesDatabase
+import com.erkindilekci.mongo.local.dao.ImageToDeleteDao
+import com.erkindilekci.mongo.local.dao.ImageToUploadDao
+import com.erkindilekci.util.Constants.IMAGES_DATABASE
+import com.erkindilekci.util.connectivity.NetworkConnectivityObserver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

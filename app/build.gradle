@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace 'com.erkindilekci.lifelog'
-    compileSdk 33
+    compileSdk ProjectConfig.compileSdk
 
     defaultConfig {
         applicationId "com.erkindilekci.lifelog"
-        minSdk 26
-        targetSdk 33
+        minSdk ProjectConfig.minSdk
+        targetSdk ProjectConfig.targetSdk
         versionCode 1
         versionName "1.0"
 
@@ -45,12 +45,10 @@ android {
         buildConfig true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.3'
+        kotlinCompilerExtensionVersion ProjectConfig.extensionVersion
     }
     packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
+        pickFirst 'META-INF/gradle/incremental.annotation.processors'
     }
 }
 
@@ -72,7 +70,7 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
     // Compose Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0"
+    implementation libs.navigation.compose
 
     // Firebase
     implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
@@ -94,8 +92,8 @@ dependencies {
     implementation 'io.realm.kotlin:library-sync:1.7.0'
 
     // Dagger Hilt
-    implementation "com.google.dagger:hilt-android:2.46.1"
-    kapt "com.google.dagger:hilt-compiler:2.46.1"
+    implementation "com.google.dagger:hilt-android:2.45"
+    kapt "com.google.dagger:hilt-compiler:2.45"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
 
     // Coil
@@ -115,4 +113,11 @@ dependencies {
 
     // One-Tap Compose
     implementation 'com.github.stevdza-san:OneTapCompose:1.0.0'
+
+    implementation(project(":core:ui"))
+    implementation(project(":core:util"))
+    implementation(project(":data:mongo"))
+    implementation(project(":feature:auth"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:addedit"))
 }

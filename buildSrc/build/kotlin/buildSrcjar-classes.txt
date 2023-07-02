@@ -1,0 +1,1 @@
+C:\Users\Erkin\StudioProjects\Kotlin\LifeLog\buildSrc\build\classes\kotlin\main\ProjectConfig.class
