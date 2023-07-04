@@ -5,7 +5,7 @@
 </div>
 
 #
-<img src="https://raw.githubusercontent.com/erkindil/GithubRepositoryEdit/main/log.gif" align="right" width="230">
+<img src="https://raw.githubusercontent.com/erkindil/GithubRepositoryEdit/main/log.gif" align="right" width="235">
 
 ## Technologies
 - Jetpack Compose
