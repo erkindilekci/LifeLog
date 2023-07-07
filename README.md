@@ -1,10 +1,9 @@
 # Life Log
 
-<div align="center">
+<p align="center">
   <img src="https://raw.githubusercontent.com/erkindil/GithubRepositoryEdit/main/lifelog.png" alt="Life Log UI">
-</div>
+</p>
 
-#
 <img src="https://raw.githubusercontent.com/erkindil/GithubRepositoryEdit/main/log.gif" align="right" width="235">
 
 ## Technologies
