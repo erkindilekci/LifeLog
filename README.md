@@ -24,7 +24,6 @@
 - Dagger-Hilt
 - Coil
 
-
 ## License
 ```xml
 Copyright 2023 Erkin Dilekci
